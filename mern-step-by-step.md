@@ -18,6 +18,12 @@ Say yes to all options
 npm i express jsonwebtoken mongoose dotenv argon2 cors
 npm i --save-dev nodemon
 ```
+- Express = Node.js framework
+- json web token = Authorization
+- Mongoose = Object Relational Model (ORM) aka Models/Schemas
+- Dotenv loads environment variables from a .env file into process.env
+- Argon2 = password hasher
+- cors = Cross-Origin Resource Sharing (CORS). Allows server connections from different origin/hosting
 
 Go to package.json and add `"server": "nodemon"` to `"scripts"`
 
