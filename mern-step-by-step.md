@@ -98,9 +98,52 @@ const UserSchema = new Schema({
   }
 })
 
-module.exports = mongoose.model(‘users’, UserSchema)
+module.exports = mongoose.model(‘User’, UserSchema)
+```
+> When you call mongoose.model() on a schema, Mongoose compiles a model for you.
+
+> The first argument is the singular name of the collection your model is for. Mongoose automatically looks for the plural, lowercased version of your model name. Thus, for the example above, the model Tank is for the tanks collection in the database.
+
+> Note: The .model() function makes a copy of schema. Make sure that you've added everything you want to schema, including hooks, before calling .model()!
+
+*https://mongoosejs.com/docs/models.html*
+
+Create `Post.js` in `models` folder
+Post.js:
+```
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
+
+const PostSchema = new Schema ({
+  title: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String
+  },
+  url: {
+    type: String
+  },
+  status: {
+    type: String,
+    enum: ['TO LEARN', 'LEARNING', 'LEARNED']
+  },
+  user: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
+})
+
+module.exports = mongoose.model('Post', PostSchema)
 ```
 
+### Set up router/routes
+Create `routes` folder in `server`
+Create `auth.js` in `routes`
 
+auth.js:
+```
+const express = require('express')
+const router = express.Router()
 
 Create `request.http` and use REST client extension in VS Code to check HTTP requests
