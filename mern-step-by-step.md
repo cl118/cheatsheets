@@ -30,7 +30,7 @@ Go to package.json and add `"server": "nodemon"` to `"scripts"`
 ### Server boilerplate
 Create `index.js` in `server`
 
-index.js:
+/server/index.js:
 ```
 const express = require (‘express’)
 const app = express()
@@ -49,7 +49,7 @@ npm run server
 1. Set up MongoDB Atlas Cluster
 2. Set MongoDB connections and admin
 
-index.js:
+/server/index.js:
 ```
 const express = require (‘express’)
 const app = express()
@@ -80,7 +80,7 @@ app.get(‘/‘, (req, res) => res.send(‘Hello world’)
 1. Create `models` folder in `server`
 2. Create `User.js` in `models` folder
 
-User.js:
+/server/models/User.js:
 ```
 const UserSchema = new Schema({
   username: {
@@ -109,7 +109,7 @@ module.exports = mongoose.model(‘User’, UserSchema)
 *https://mongoosejs.com/docs/models.html*
 
 Create `Post.js` in `models` folder
-Post.js:
+/server/models/Post.js:
 ```
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
@@ -141,7 +141,7 @@ module.exports = mongoose.model('Post', PostSchema)
 Create `routes` folder in `server`
 Create `auth.js` in `routes`
 
-auth.js:
+/server/routes/auth.js:
 ```
 const express = require('express')
 const router = express.Router()
