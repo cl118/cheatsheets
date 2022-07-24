@@ -4,14 +4,13 @@
 
 ### Setting up server
 Create server folder in project folder cd into it
+Initialize to defaults
 
 ```
 mkdir server
 cd server
-npm init
+npm init -y
 ```
-
-Say yes to all options
 
 ### Install dependencies
 ```
@@ -24,6 +23,7 @@ npm i --save-dev nodemon
 - Dotenv loads environment variables from a .env file into process.env
 - Argon2 = password hasher
 - cors = Cross-Origin Resource Sharing (CORS). Allows server connections from different origin/hosting
+- Nodemon = monitors server and restarts on save
 
 Go to package.json and add `"server": "nodemon"` to `"scripts"`
 
@@ -46,8 +46,8 @@ npm run server
 
 ### Connect to MongoDB
 
-Set up MongoDB Atlas Cluster
-Set MongoDB connections and admin
+1. Set up MongoDB Atlas Cluster
+2. Set MongoDB connections and admin
 
 index.js:
 ```
@@ -77,8 +77,8 @@ app.get(‘/‘, (req, res) => res.send(‘Hello world’)
 
 ### Create models/schemas
 
-Create `models` folder in `server`
-Create `User.js` in `models` folder
+1. Create `models` folder in `server`
+2. Create `User.js` in `models` folder
 
 User.js:
 ```
@@ -102,7 +102,7 @@ module.exports = mongoose.model(‘User’, UserSchema)
 ```
 > When you call mongoose.model() on a schema, Mongoose compiles a model for you.
 
-> The first argument is the singular name of the collection your model is for. Mongoose automatically looks for the plural, lowercased version of your model name. Thus, for the example above, the model Tank is for the tanks collection in the database.
+> The first argument is the singular name of the collection your model is for. Mongoose automatically looks for the plural, lowercased version of your model name. Thus, for the example above, the model User is for the users collection in the database.
 
 > Note: The .model() function makes a copy of schema. Make sure that you've added everything you want to schema, including hooks, before calling .model()!
 
