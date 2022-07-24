@@ -1,6 +1,8 @@
 # MERN Step by Step Example
 This step by step cheat sheet translates Henry Web Dev's MERN stack tutorial on YouTube from Vietnamese to English, updates some out of date syntax, and sums up some of the extra notable information. Feel free to take this and add/remove what works for you. This was incredibly helpful for me while learning the MERN stack so I want to pass it along. 
 
+This guide assumes the reader knows basics and tasks needed to be completed outside of coding will not be covered. These tasks will be numbered to differentiate them from the explanation of tasks to be coded. 
+
 ## Server
 
 ### Setting up server
