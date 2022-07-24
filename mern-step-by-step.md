@@ -80,8 +80,8 @@ app.get(‘/‘, (req, res) => res.send(‘Hello world’)
 
 ### Create models/schemas
 
-1. Create `models` folder in `server`
-2. Create `User.js` in `models` folder
+Create `models` folder in `server`
+Create `User.js` in `models` folder
 
 /server/models/User.js:
 ```
