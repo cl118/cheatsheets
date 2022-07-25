@@ -325,6 +325,7 @@ While in development, you can specifically put "incorrect username" or "incorrec
 
 ### Check login route with request.http
 Add `###` below previous post request to separate requests
+
 Add to request.http:
 ```
 POST http://localhost:5000/api/auth/login
@@ -338,9 +339,109 @@ Content-Type: application/json
 Try changing username/password to incorrect values to check responses as well.
 
 
+## Set up authentication middleware
+Create folder `middleware` in `/server`
+Create `auth.js` file in `/server/middleware`
+
+/server/middleware/auth.js:
+```
+const jwt = require('jsonwebtoken');
+
+const verifyToken = (req, res, next) => {
+  const authHeader = req.header('Authorization');
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token)
+    return res
+      .status(401)
+      .json({ success: false, message: 'Access token not found' });
+
+  try {
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+    req.userId = decoded.userId;
+    next();
+  } catch (error) {
+    console.log(error);
+    return res.status(403).json({ success: false, message: 'Invalid token' });
+  }
+};
+
+module.exports = verifyToken;
+```
+This will ensure user has a valid access token and provide user id information for posts
+
+
 ## Set up post routes
 Create `post.js` in `/server/routes/`.
 
-/server/routes/post.js:
+### Create post request
+The following code will declare the necessary modules and code a POST request to create new posts
 
-CONTINUE 56 MINS
+/server/routes/post.js:
+```
+const express = require('express');
+const router = express.Router();
+const verifyToken = require('../middleware/auth');
+
+const Post = require('../models/Post');
+
+// @route POST api/posts
+// @desc Create post
+// @access Private
+router.post('/', verifyToken, async (req, res) => {
+  const { title, description, url, status } = req.body;
+
+  // Simple validation
+  if (!title)
+    return res
+      .status(400)
+      .json({ success: false, message: 'Title is required' });
+
+  try {
+    const newPost = new Post({
+      title,
+      description,
+      url: url.startsWith('https://') ? url : `https://${url}`,
+      status: status || 'TO LEARN',
+      user: req.userId,
+    });
+
+    await newPost.save();
+
+    res.json({
+      success: true,
+      message: 'Post created successfully',
+      post: newPost,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+```
+
+### Check post request with request.http
+Add `###` again below previous request to separate requests
+
+Add following code to request.http:
+```
+POST http://localhost:5000/api/posts
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MmQ0ZWM3MGJlNTQ5YTJmMjdjNjhmNTEiLCJpYXQiOjE2NTgxMjE0MTR9.WRZpibPt1tmCN_wJyqKEXnKW-2boYOg1s-V8sutiCWc
+
+
+{
+    "title": "React",
+    "description": "React",
+    "url": "react.com",
+    "status": "LEARNING"
+}
+```
+In the above code example, the long string after `Authorization: Bearer` is the access token assigned to a specific user. To submit a valid POST, you'll need to copy the "accessToken" from the login request response and paste it into the post request after `Authorization Bearer`. You can purposefully submit an invalid token to see the response of "Invalid token" to check.
+
+Try creating several posts with different information and verify in your MongoDB for new posts in your appropriate collection.
+
+
+### Create get posts request
+
