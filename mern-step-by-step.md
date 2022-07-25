@@ -9,14 +9,14 @@ This walkthrough summarizes and translates Henry Web Dev's MERN stack tutorial o
 Create server folder in project folder cd into it
 Initialize to defaults
 
-```javascript
+```
 mkdir server
 cd server
 npm init -y
 ```
 
 ### Install dependencies
-```javascript
+```
 npm i express jsonwebtoken mongoose dotenv argon2 cors
 npm i -D nodemon
 ```
@@ -81,7 +81,7 @@ app.get(‘/‘, (req, res) => res.send(‘Hello world’)
 ### Create .env file
 Create `.env` file in `server`
 .env:
-```javascript
+```
 DB_USERNAME=<MONGODB_DATABASE_USERNAME>
 DB_PASSWORD=<MONGODB_DATABASE_PASSWORD>
 ```
@@ -428,7 +428,7 @@ Add following code to request.http:
 ```javascript
 POST http://localhost:5000/api/posts
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MmQ0ZWM3MGJlNTQ5YTJmMjdjNjhmNTEiLCJpYXQiOjE2NTgxMjE0MTR9.WRZpibPt1tmCN_wJyqKEXnKW-2boYOg1s-V8sutiCWc
+Authorization: Bearer <accessToken>
 
 
 {
@@ -438,7 +438,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MmQ0Z
     "status": "LEARNING"
 }
 ```
-In the above code example, the long string after `Authorization: Bearer` is the access token assigned to a specific user. To submit a valid POST, you'll need to copy the "accessToken" from the login request response and paste it into the post request after `Authorization Bearer`. You can purposefully submit an invalid token to see the response of "Invalid token" to check.
+In the above code example, <accessToken> after `Authorization: Bearer` is the access token assigned to a specific user. To submit a valid POST request, you'll need to copy the "accessToken" from the login request response and paste it into the post request after `Authorization: Bearer`. You can purposefully submit an invalid token to check the response of "Invalid token".
 
 Try creating several posts with different information and verify in your MongoDB for new posts in your appropriate collection.
 
@@ -470,7 +470,7 @@ Once again add `###` below previous requests to separate requests
 Add following code to request.http with valid access token:
 ```javascript
 GET http://localhost:5000/api/posts
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MmQ0ZTEyNWZmYjE0YWZjNmQxZDAyMWIiLCJpYXQiOjE2NTgxMjg0OTF9.EMb0sBYPggXaa3wosNtWqeOxM_CR6Xj4RGIU1YomUKg
+Authorization: Bearer <accessToken>
 ```
 The response should be an array of all posts created by the current user
 
