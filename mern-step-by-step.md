@@ -78,6 +78,22 @@ connectDB()
 app.get(‘/‘, (req, res) => res.send(‘Hello world’)
 ```
 
+
+### Create .env file
+Create `.env` file in `server`
+.env:
+```
+DB_USERNAME=<MONGODB_DATABASE_USERNAME>
+DB_PASSWORD=<MONGODB_DATABASE_PASSWORD>
+```
+Now that we've tested the connection to MongoDB, we'll move the username and password into a .env file to protect our information.
+Add `require('dotenv').config()` to top of `/server/index.js` and replace the username and password in the MongoDB URI with the variables created using object literals.
+
+Example:
+```
+`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.ksh2g.mongodb.net/<COLLECTION_NAME>?retryWrites=true&w=majority`
+```
+
 ### Create models/schemas
 
 Create `models` folder in `server`
@@ -140,7 +156,7 @@ const PostSchema = new Schema ({
 module.exports = mongoose.model('Post', PostSchema)
 ```
 
-### Set up router/routes
+### Set up router/routes boilerplate
 Create `routes` folder in `server`
 Create `auth.js` in `routes`
 
@@ -149,4 +165,171 @@ Create `auth.js` in `routes`
 const express = require('express')
 const router = express.Router()
 
-Create `request.http` and use REST client extension in VS Code to check HTTP requests
+const User = require('../models/User')
+
+router.get('/', (req, res) => res.send('USER ROUTE'))
+
+module.exports = router
+```
+
+### Add router to server/index.js
+Add `const authRouter = require('./routes/auth')` to `server/index.js`
+
+Remove `app.get(‘/‘, (req, res) => res.send(‘Hello world’)` now that we know it works.
+
+Replace with: 
+```
+app.use(express.json())
+app.use('/api/auth', authRouter)
+```
+This will allow the server to read json format and route all authentication related routes to the authRouter.
+
+
+### Check API route with REST client extension
+
+Create `request.http` in `server` and use REST client extension in VS Code to check HTTP requests
+
+/server/request.http:
+```
+GET http://localhost:5000/api/auth
+```
+Click "Send Request" and you should receive a response of "USER ROUTE" as was defined in `authRoutes`
+
+
+## Set up authentication routes
+Add to /server/routes/auth.js:
+```
+const argon2 = require('argon2');
+const jwt = require('jsonwebtoken');
+```
+
+Add to /server/.env:
+```
+ACCESS_TOKEN_SECRET=<You can put a bunch of gibberish here as a token secret i.e. 'alkshgglkasjhaakjgh9872ak'>
+```
+
+### Create registration route
+Add to /server/routes/auth.js:
+```
+// @route POST api/auth/register
+// @desc Register user
+// @access Public
+router.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+
+  // Simple Validation
+  if (!username || !password)
+    return res
+      .status(400)
+      .json({ success: false, message: 'Missing username and/or password' });
+
+  try {
+    // Check for existing user
+    const user = await User.findOne({ username });
+    if (user)
+      return res
+        .status(400)
+        .json({ success: false, message: 'Username already taken' });
+
+    // All good
+    const hashedPassword = await argon2.hash(password);
+    const newUser = new User({ username, password: hashedPassword });
+    await newUser.save();
+
+    // Return token
+    const accessToken = jwt.sign(
+      { userId: newUser._id },
+      process.env.ACCESS_TOKEN_SECRET
+    );
+
+    res.json({
+      success: true,
+      message: 'User created successfully',
+      accessToken,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+```
+
+### Check register route with `request.http`
+Delete previous content in `request.http`.
+
+request.http:
+```
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+    "username": "user",
+    "password": "password"
+}
+```
+Check response for success confirmation and check MongoDB for created user(s)
+
+
+### Create login route
+Add to /server/routes/auth.js:
+```
+// @route POST api/auth/login
+// @desc Login user
+// @access Public
+router.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  // Simple Validation
+  if (!username || !password)
+    return res
+      .status(400)
+      .json({ success: false, message: 'Missing username and/or password' });
+
+  try {
+    // Check for existing user
+    const user = await User.findOne({ username });
+    if (!user)
+      return res
+        .status(400)
+        .json({ success: false, message: 'Incorrect username or password' });
+
+    // Username found
+    const passwordValid = await argon2.verify(user.password, password);
+    if (!passwordValid)
+      return res
+        .status(400)
+        .json({ success: false, message: 'Incorrect username or password' });
+
+    // All good
+    // Return token
+    const accessToken = jwt.sign(
+      { userId: user._id },
+      process.env.ACCESS_TOKEN_SECRET
+    );
+
+    res.json({
+      success: true,
+      message: 'User logged in successfully',
+      accessToken,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+```
+While in development, you can specifically put "incorrect username" or "incorrect username" for testing purposes, but remember to change it to "incorrect username or password" for both responses in production for increased security purposes.
+
+### Check login route with request.http
+Add `###` below previous post request to separate requests
+Add to request.http:
+```
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+    "username": "user",
+    "password": "password"
+}
+```
+Try changing username/password to incorrect values to check responses as well.
