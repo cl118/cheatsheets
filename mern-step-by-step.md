@@ -47,7 +47,7 @@ app.listen(PORT, () => console.log(`Server started on port ${PORT}`))
 Type `npm run server` in terminal to start up server.
 
 ### Connect to MongoDB
-
+Go to [cloud.mongodb.com](https://cloud.mongodb.com) for the following steps.
 1. Set up MongoDB Atlas Cluster
 2. Set MongoDB connections and admin
 
