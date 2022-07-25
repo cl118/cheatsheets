@@ -583,3 +583,7 @@ DELETE http://localhost:5000/api/posts/<POST_ID>
 Authorization: Bearer <accessToken>
 ```
 Just like the PUT request, you will need a post ID that you want to delete. Paste it into the <POST_ID> and send your request. The response should be the post you deleted and you can confirm by doing a GET request of posts and see that it is no longer there.
+
+Congrats! You've finished the back end portion!
+  
+Front end portion to be continued...
