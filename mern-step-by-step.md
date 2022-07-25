@@ -375,7 +375,7 @@ This will ensure user has a valid access token and provide user id information f
 ## Set up post routes
 Create `post.js` in `/server/routes/`.
 
-### Create post request
+### Create POST request
 The following code will declare the necessary modules and code a POST request to create new posts
 
 /server/routes/post.js:
@@ -421,7 +421,7 @@ router.post('/', verifyToken, async (req, res) => {
 });
 ```
 
-### Check post request with request.http
+### Check POST request with request.http
 Add `###` again below previous request to separate requests
 
 Add following code to request.http:
@@ -443,5 +443,143 @@ In the above code example, the long string after `Authorization: Bearer` is the 
 Try creating several posts with different information and verify in your MongoDB for new posts in your appropriate collection.
 
 
-### Create get posts request
+### Create GET posts request
+Next, we will code a GET request to get all posts by the current logged in user. Adding `.populate('user', ['username',])` will add the username to the response so you don't need to keep referencing the user ID in MongoDB.
 
+Add to /server/routes/post.js:
+```
+// @route GET api/posts
+// @desc Get posts
+// @access Private
+router.get('/', verifyToken, async (req, res) => {
+  try {
+    const posts = await Post.find({ user: req.userId }).populate('user', [
+      'username',
+    ]);
+    res.json({ success: true, posts });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+```
+
+### Check GET request with request.http
+Once again add `###` below previous requests to separate requests
+
+Add following code to request.http with valid access token:
+```
+GET http://localhost:5000/api/posts
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MmQ0ZTEyNWZmYjE0YWZjNmQxZDAyMWIiLCJpYXQiOjE2NTgxMjg0OTF9.EMb0sBYPggXaa3wosNtWqeOxM_CR6Xj4RGIU1YomUKg
+```
+The response should be an array of all posts created by the current user
+
+
+### Create PUT request
+After GET and POST, we will make a PUT request to enable us to update necessary information. This is similar to the POST request earlier, but we need to add `:id` of post we are updating. Because we are updating the information, some of the fields are not required, so we will need to add `|| ''` to the description and URL fields in case they are left blank. The status will default to 'TO LEARN' and the title is required so it does not need this.
+
+Add to /server/routes/post.js:
+```
+// @route PUT api/posts
+// @desc Update post
+// @access Private
+router.put('/:id', verifyToken, async (req, res) => {
+  const { title, description, url, status } = req.body;
+
+  // Simple validation
+  if (!title)
+    return res
+      .status(400)
+      .json({ success: false, message: 'Title is required' });
+
+  try {
+    let updatedPost = {
+      title,
+      description: description || '',
+      url: (url.startsWith('https://') ? url : `https://${url}`) || '',
+      status: status || 'TO LEARN',
+    };
+
+    const postUpdateCondition = { _id: req.params.id, user: req.userId };
+
+    updatedPost = await Post.findOneAndUpdate(
+      postUpdateCondition,
+      updatedPost,
+      { new: true }
+    );
+    
+    // User not authorized to update post or post not found
+    if (!updatedPost)
+      return res.status(401).json({
+        success: false,
+        message: 'Post not found or user not authorized',
+      });
+
+    res.json({ success: true, message: 'Post updated', post: updatedPost });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+```
+
+### Check PUT request with request.http
+Once again we'll add `###` below the previous posts to start a new request.
+
+Add following code to request.http:
+```
+PUT http://localhost:5000/api/posts/<POST_ID>
+Content-Type: application/json
+Authorization: Bearer <accessToken>
+
+{
+    "title": "Next.js",
+    "description": "Next.js is AMAZING!",
+    "url": "nextjs.org",
+    "status": "LEARNING"
+}
+```
+In the code above, copy the post ID of a post you want to update from your GET request and paste it into the PUT url. Update the information and see if it works! If it's successful, check MongoDB for updated information.
+
+
+### Create DELETE request
+Last but not least, we will need a way to delete our posts.
+
+Add to /server/routes/post.js:
+```
+// @route DELETE api/posts
+// @desc Delete post
+// @access Private
+router.delete('/:id', verifyToken, async (req, res) => {
+  try {
+    const postDeleteCondition = { _id: req.params.id, user: req.userId };
+    const deletedPost = await Post.findOneAndDelete(postDeleteCondition);
+
+    // User not authorized or post not found
+    if (!deletedPost)
+      return res.status(401).json({
+        success: false,
+        message: 'Post not found or user not authorized',
+      });
+
+    res.json({
+      success: true,
+      message: 'Post deleted successfully',
+      post: deletedPost,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+```
+
+### Check DELETE request with request.http
+You know the drill... Add `###` to `request.http` to start a new request.
+
+request.http:
+```
+DELETE http://localhost:5000/api/posts/<POST_ID>
+Authorization: Bearer <accessToken>
+```
+Just like the PUT request, you will need a post ID that you want to delete. Paste it into the <POST_ID> and send your request. The response should be the post you deleted and you can confirm by doing a GET request of posts and see that it is no longer there.
