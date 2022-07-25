@@ -18,7 +18,7 @@ npm init -y
 ### Install dependencies
 ```
 npm i express jsonwebtoken mongoose dotenv argon2 cors
-npm i --save-dev nodemon
+npm i -D nodemon
 ```
 - Express = Node.js framework
 - json web token = Authorization
@@ -156,7 +156,7 @@ const PostSchema = new Schema ({
 module.exports = mongoose.model('Post', PostSchema)
 ```
 
-### Set up router/routes boilerplate
+### Set up authRoutes boilerplate
 Create `routes` folder in `server`
 Create `auth.js` in `routes`
 
@@ -333,3 +333,11 @@ Content-Type: application/json
 }
 ```
 Try changing username/password to incorrect values to check responses as well.
+
+
+## Set up post routes
+Create `post.js` in `/server/routes/`.
+
+/server/routes/post.js:
+
+CONTINUE 56 MINS
