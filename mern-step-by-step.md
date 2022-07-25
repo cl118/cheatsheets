@@ -1,5 +1,5 @@
 # MERN Step by Step Example
-This walkthrough summarizes and translates Henry Web Dev's MERN stack tutorial on YouTube from Vietnamese to English and updates out of date syntax. Feel free to take this and add/remove what works for you. This was incredibly helpful for me while learning the MERN stack so I want to pass it along. This walkthrough is not as comprehensive as the video and some shortcuts were taken. If you'd like to see him code it live, you can see it at https://www.youtube.com/watch?v=rgFd17fyM4A and reference the code here. This can be especially helpful when encountering errors with old syntax.
+This walkthrough summarizes and translates Henry Web Dev's MERN stack tutorial on YouTube from Vietnamese to English and updates out of date syntax. Feel free to take this and add/remove what works for you. This was incredibly helpful for me while learning the MERN stack so I want to pass it along. This walkthrough is not as comprehensive as the video and some shortcuts were taken. If you'd like to see him code it live, you can [watch it](https://www.youtube.com/watch?v=rgFd17fyM4A) and reference the code here. This can be especially helpful when encountering errors with old syntax.
 
 *This guide assumes the reader knows the fundamentals and tasks needed to be completed outside of coding will not be covered. These tasks will be numbered to differentiate them from the explanation of tasks to be coded.*
 
@@ -9,14 +9,14 @@ This walkthrough summarizes and translates Henry Web Dev's MERN stack tutorial o
 Create server folder in project folder cd into it
 Initialize to defaults
 
-```
+```javascript
 mkdir server
 cd server
 npm init -y
 ```
 
 ### Install dependencies
-```
+```javascript
 npm i express jsonwebtoken mongoose dotenv argon2 cors
 npm i -D nodemon
 ```
@@ -34,7 +34,7 @@ Go to package.json and add `"server": "nodemon index"` to `"scripts"`
 Create `index.js` in `server`
 
 /server/index.js:
-```
+```javascript
 const express = require(‘express’)
 const app = express()
 
@@ -52,7 +52,7 @@ Type `npm run server` in terminal to start up server.
 2. Set MongoDB connections and admin
 
 /server/index.js:
-```
+```javascript
 const express = require (‘express’)
 const app = express()
 
@@ -81,7 +81,7 @@ app.get(‘/‘, (req, res) => res.send(‘Hello world’)
 ### Create .env file
 Create `.env` file in `server`
 .env:
-```
+```javascript
 DB_USERNAME=<MONGODB_DATABASE_USERNAME>
 DB_PASSWORD=<MONGODB_DATABASE_PASSWORD>
 ```
@@ -89,7 +89,7 @@ Now that we've tested the connection to MongoDB, we'll move the username and pas
 Add `require('dotenv').config()` to top of `/server/index.js` and replace the username and password in the MongoDB URI with the variables created using object literals.
 
 Example:
-```
+```javascript
 `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.ksh2g.mongodb.net/<COLLECTION_NAME>?retryWrites=true&w=majority`
 ```
 
@@ -99,7 +99,7 @@ Create `models` folder in `server`
 Create `User.js` in `models` folder
 
 /server/models/User.js:
-```
+```javascript
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
@@ -131,7 +131,7 @@ module.exports = mongoose.model(‘User’, UserSchema)
 
 Create `Post.js` in `models` folder
 /server/models/Post.js:
-```
+```javascript
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
@@ -164,7 +164,7 @@ Create `routes` folder in `server`
 Create `auth.js` in `routes`
 
 /server/routes/auth.js:
-```
+```javascript
 const express = require('express')
 const router = express.Router()
 
@@ -181,7 +181,7 @@ Add `const authRouter = require('./routes/auth')` to `server/index.js`
 Remove `app.get(‘/‘, (req, res) => res.send(‘Hello world’)` now that we know it works.
 
 Replace with: 
-```
+```javascript
 app.use(express.json())
 app.use('/api/auth', authRouter)
 ```
@@ -193,7 +193,7 @@ This will allow the server to read json format and route all authentication rela
 Create `request.http` in `server` and use REST client extension in VS Code to check HTTP requests
 
 /server/request.http:
-```
+```javascript
 GET http://localhost:5000/api/auth
 ```
 Click "Send Request" and you should receive a response of "USER ROUTE" as was defined in `authRoutes`
@@ -201,19 +201,19 @@ Click "Send Request" and you should receive a response of "USER ROUTE" as was de
 
 ## Set up authentication routes
 Add to /server/routes/auth.js:
-```
+```javascript
 const argon2 = require('argon2');
 const jwt = require('jsonwebtoken');
 ```
 
 Add to /server/.env:
-```
+```javascript
 ACCESS_TOKEN_SECRET=<You can put a bunch of gibberish here as a token secret i.e. 'alkshgglkasjhaakjgh9872ak'>
 ```
 
 ### Create registration route
 Add to /server/routes/auth.js:
-```
+```javascript
 // @route POST api/auth/register
 // @desc Register user
 // @access Public
@@ -261,7 +261,7 @@ router.post('/register', async (req, res) => {
 Delete previous content in `request.http`.
 
 request.http:
-```
+```javascript
 POST http://localhost:5000/api/auth/register
 Content-Type: application/json
 
@@ -275,7 +275,7 @@ Check response for success confirmation and check MongoDB for created user(s)
 
 ### Create login route
 Add to /server/routes/auth.js:
-```
+```javascript
 // @route POST api/auth/login
 // @desc Login user
 // @access Public
@@ -327,7 +327,7 @@ While in development, you can specifically put "incorrect username" or "incorrec
 Add `###` below previous post request to separate requests
 
 Add to request.http:
-```
+```javascript
 POST http://localhost:5000/api/auth/login
 Content-Type: application/json
 
@@ -344,7 +344,7 @@ Create folder `middleware` in `/server`
 Create `auth.js` file in `/server/middleware`
 
 /server/middleware/auth.js:
-```
+```javascript
 const jwt = require('jsonwebtoken');
 
 const verifyToken = (req, res, next) => {
@@ -379,7 +379,7 @@ Create `post.js` in `/server/routes/`.
 The following code will declare the necessary modules and code a POST request to create new posts
 
 /server/routes/post.js:
-```
+```javascript
 const express = require('express');
 const router = express.Router();
 const verifyToken = require('../middleware/auth');
@@ -425,7 +425,7 @@ router.post('/', verifyToken, async (req, res) => {
 Add `###` again below previous request to separate requests
 
 Add following code to request.http:
-```
+```javascript
 POST http://localhost:5000/api/posts
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MmQ0ZWM3MGJlNTQ5YTJmMjdjNjhmNTEiLCJpYXQiOjE2NTgxMjE0MTR9.WRZpibPt1tmCN_wJyqKEXnKW-2boYOg1s-V8sutiCWc
@@ -447,7 +447,7 @@ Try creating several posts with different information and verify in your MongoDB
 Next, we will code a GET request to get all posts by the current logged in user. Adding `.populate('user', ['username',])` will add the username to the response so you don't need to keep referencing the user ID in MongoDB.
 
 Add to /server/routes/post.js:
-```
+```javascript
 // @route GET api/posts
 // @desc Get posts
 // @access Private
@@ -468,7 +468,7 @@ router.get('/', verifyToken, async (req, res) => {
 Once again add `###` below previous requests to separate requests
 
 Add following code to request.http with valid access token:
-```
+```javascript
 GET http://localhost:5000/api/posts
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MmQ0ZTEyNWZmYjE0YWZjNmQxZDAyMWIiLCJpYXQiOjE2NTgxMjg0OTF9.EMb0sBYPggXaa3wosNtWqeOxM_CR6Xj4RGIU1YomUKg
 ```
@@ -479,7 +479,7 @@ The response should be an array of all posts created by the current user
 After GET and POST, we will make a PUT request to enable us to update necessary information. This is similar to the POST request earlier, but we need to add `:id` of post we are updating. Because we are updating the information, some of the fields are not required, so we will need to add `|| ''` to the description and URL fields in case they are left blank. The status will default to 'TO LEARN' and the title is required so it does not need this.
 
 Add to /server/routes/post.js:
-```
+```javascript
 // @route PUT api/posts
 // @desc Update post
 // @access Private
@@ -527,7 +527,7 @@ router.put('/:id', verifyToken, async (req, res) => {
 Once again we'll add `###` below the previous posts to start a new request.
 
 Add following code to request.http:
-```
+```javascript
 PUT http://localhost:5000/api/posts/<POST_ID>
 Content-Type: application/json
 Authorization: Bearer <accessToken>
@@ -546,7 +546,7 @@ In the code above, copy the post ID of a post you want to update from your GET r
 Last but not least, we will need a way to delete our posts.
 
 Add to /server/routes/post.js:
-```
+```javascript
 // @route DELETE api/posts
 // @desc Delete post
 // @access Private
@@ -578,7 +578,7 @@ router.delete('/:id', verifyToken, async (req, res) => {
 You know the drill... Add `###` to `request.http` to start a new request.
 
 request.http:
-```
+```javascript
 DELETE http://localhost:5000/api/posts/<POST_ID>
 Authorization: Bearer <accessToken>
 ```
