@@ -28,14 +28,14 @@ npm i -D nodemon
 - cors = Cross-Origin Resource Sharing (CORS). Allows server connections from different origin/hosting
 - Nodemon = monitors server and restarts on save
 
-Go to package.json and add `"server": "nodemon"` to `"scripts"`
+Go to package.json and add `"server": "nodemon index"` to `"scripts"`
 
 ### Server boilerplate
 Create `index.js` in `server`
 
 /server/index.js:
 ```
-const express = require (‘express’)
+const express = require(‘express’)
 const app = express()
 
 app.get(‘/‘, (req, res) => res.send(‘Hello world’)
@@ -101,6 +101,9 @@ Create `User.js` in `models` folder
 
 /server/models/User.js:
 ```
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
+
 const UserSchema = new Schema({
   username: {
     type: String,
@@ -151,6 +154,7 @@ const PostSchema = new Schema ({
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User'
+  }
 })
 
 module.exports = mongoose.model('Post', PostSchema)
