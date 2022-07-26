@@ -375,6 +375,12 @@ This will ensure user has a valid access token and provide user id information f
 ## Set up post routes
 Create `post.js` in `/server/routes/`.
 
+Add to /server/index.js below the auth routes:
+```
+const postRouter = require('./routes/post')
+app.use('/api/posts', postRouter)
+```
+
 ### Create POST request
 The following code will declare the necessary modules and code a POST request to create new posts
 
@@ -419,6 +425,8 @@ router.post('/', verifyToken, async (req, res) => {
     res.status(500).json({ success: false, message: 'Internal Server Error' });
   }
 });
+
+module.exports = router
 ```
 
 ### Check POST request with request.http
