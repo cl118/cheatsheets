@@ -53,7 +53,7 @@ Go to [cloud.mongodb.com](https://cloud.mongodb.com) for the following steps.
 
 /server/index.js:
 ```javascript
-const express = require (‘express’)
+const express = require ('express')
 const app = express()
 
 /* New code below this line */
