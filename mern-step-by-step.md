@@ -38,7 +38,7 @@ Create `index.js` in `server`
 const express = require(‘express’)
 const app = express()
 
-app.get(‘/‘, (req, res) => res.send(‘Hello world’)
+app.get('/', (req, res) => res.send('Hello world')
 
 const PORT = 5000
 
