@@ -74,7 +74,7 @@ connectDB()
 
 /* New code above this line */
 
-app.get(‘/‘, (req, res) => res.send(‘Hello world’)
+app.get('/', (req, res) => res.send('Hello world')
 ```
 
 
